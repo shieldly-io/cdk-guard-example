@@ -24,6 +24,51 @@ npm run guard
 
 `@shieldly/cdk-guard` finds these issues, explains each one in plain English, and provides the tightened policy.
 
+The stack also demonstrates **risk acceptance**: the broad IAM role finding is suppressed inline via `accept()`. It appears as `[ACCEPTED]` in the output and never fails CI — because the developer consciously chose to accept it.
+
+## Risk acceptance
+
+Sometimes you know better than the AI. Accept a finding so it never blocks CI again:
+
+### Option 1 — Inline CDK (scoped to one resource, visible in code review)
+
+```js
+import { accept } from '@shieldly/cdk-guard';
+
+const broadRole = new iam.Role(this, 'BroadRole', { ... });
+accept(broadRole, ['Overly Permissive S3 Access in IAM Role'], {
+  reason: 'Bootstrap role — removed post-deploy',
+});
+```
+
+### Option 2 — CLI (writes to .shieldly.json, no CDK code changes)
+
+```bash
+# Scope to a specific construct path (recommended):
+npx @shieldly/cdk-guard accept "Overly Permissive S3 Access in IAM Role" \
+  --path "*/BroadRole/*" \
+  --reason "Bootstrap role — removed post-deploy"
+
+# Or accept globally across all resources:
+npx @shieldly/cdk-guard accept "Incomplete S3 Public Access Blocking"
+```
+
+### Option 3 — .shieldly.json (edit by hand)
+
+```json
+{
+  "ignore": [
+    {
+      "title": "Overly Permissive S3 Access in IAM Role",
+      "path": "*/BroadRole/*",
+      "reason": "Bootstrap role — removed post-deploy"
+    }
+  ]
+}
+```
+
+**Precedence:** inline metadata > config path-glob > config global title-only. Accepted findings print in the `[ACCEPTED]` section and never count toward `--fail-on`.
+
 ## Usage patterns
 
 ### Pattern A — CLI (no code changes, any language CDK app)
