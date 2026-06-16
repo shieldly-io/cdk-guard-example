@@ -1,0 +1,25 @@
+{
+  "name": "cdk-guard-example",
+  "version": "1.0.0",
+  "description": "Example CDK app demonstrating @shieldly/cdk-guard",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "synth": "cdk synth",
+    "synth:check": "cdk synth && npx @shieldly/cdk-guard --no-synth",
+    "guard": "npx @shieldly/cdk-guard",
+    "guard:critical-only": "npx @shieldly/cdk-guard --fail-on Critical",
+    "guard:json": "npx @shieldly/cdk-guard --format json"
+  },
+  "dependencies": {
+    "@shieldly/cdk-guard": "^1.0.0",
+    "aws-cdk-lib": "^2.0.0",
+    "constructs": "^10.0.0"
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
